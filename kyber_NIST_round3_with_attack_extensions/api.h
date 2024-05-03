@@ -38,13 +38,12 @@
 
 
 int crypto_kem_keypair(unsigned char *pk, unsigned char *sk, polyvec * skpoly);
-int oracle(const unsigned char * ct, const unsigned char * sk, unsigned char * msg_A);
 
 
 int kemenc_Attack(unsigned char * ct, 
                   unsigned char * m, 
                   const unsigned char * pk, 
-                  int h, int k, int select);
+                  int8_t h[], int block_index);
 
 
 #define crypto_kem_enc KYBER_NAMESPACE(_enc)

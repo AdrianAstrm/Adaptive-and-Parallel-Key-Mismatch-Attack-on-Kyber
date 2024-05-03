@@ -26,7 +26,7 @@ void indcpa_dec(uint8_t m[KYBER_INDCPA_MSGBYTES],
 // M
 void enc(unsigned char * c, 
          const unsigned char * m, 
-         int h, int k, int select);
+         int8_t h[], int block_index);
 
 
 #endif

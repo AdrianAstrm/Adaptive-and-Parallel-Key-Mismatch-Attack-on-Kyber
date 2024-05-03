@@ -358,6 +358,21 @@ static void pack_ciphertext_Attack(unsigned char *r, polyvec *b, poly *v)
   polyvec_compress(r, b);
   r = r+KYBER_POLYVECCOMPRESSEDBYTES;
   uint8_t t[8];
+
+#if KYBER_K == 2 || KYBER_K == 3
+  for(int i=0;i<KYBER_N;i+=8)
+  {
+    for(int j=0;j<8;j++)
+      t[j] = (uint32_t)v->coeffs[i+j];
+
+    r[0] = t[0] | (t[1] << 4);
+    r[1] = t[2] | (t[3] << 4);
+    r[2] = t[4] | (t[5] << 4);
+    r[3] = t[6] | (t[7] << 4);
+    r += 4;
+  }
+  
+#elif KYBER_K == 4
   for(int i=0;i<KYBER_N/8;i++) {
     for(int j=0;j<8;j++)
       t[j] = (uint32_t)v->coeffs[8*i+j] ;
@@ -369,6 +384,8 @@ static void pack_ciphertext_Attack(unsigned char *r, polyvec *b, poly *v)
     r[4] = (t[6] >> 2) | (t[7] << 3);
     r += 5;
   }
+
+#endif
 }
 
 
@@ -376,25 +393,26 @@ static void pack_ciphertext_Attack(unsigned char *r, polyvec *b, poly *v)
 /* input  : m, h, k, select
 *  output : c 
 */
+
 void enc(unsigned char * c, 
          const unsigned char * m, 
-         int h, int k, int select)
+         int8_t h[], int block_index)
 {
   polyvec Pb = { .vec[0] = {0} };  //init Pb = 0
   poly v = { .coeffs = {0} };      //init v = 0
 
   poly r;
   poly_frommsg(&r, m);
-
-  /*  set 
-   *  Pb[0]    = rounding(q/32)  when  k  = 0
-   *  P[256-k] = rounding(q/32)  when  k != 0      
-   */
-  k == 0 ? (Pb.vec[select].coeffs[0] = (int)(KYBER_Q/32.0 + 0.5)) 
-         : (Pb.vec[select].coeffs[256-k] = (int)(-(KYBER_Q/32.0 + 0.5)));
-
+  
+  for(int i=0; i<KYBER_N; i++)
+  {
+      v.coeffs[i] = h[i];   // set c2 = h
+  }
+#if KYBER_K == 2 || KYBER_K == 3
+  Pb.vec[block_index].coeffs[0] = (int)(KYBER_Q/16.0 + 0.5);
+#elif KYBER_K == 4
+  Pb.vec[block_index].coeffs[0] = (int)(KYBER_Q/32.0 + 0.5);
+#endif
   polyvec_reduce(&Pb);  // compress(Pb) = c1
-  v.coeffs[0] = h;      // set c2[0] = h
-
   pack_ciphertext_Attack(c, &Pb, &v);    // pack all c
 }

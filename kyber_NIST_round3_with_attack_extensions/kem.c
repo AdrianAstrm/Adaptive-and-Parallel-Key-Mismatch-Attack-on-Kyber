@@ -137,35 +137,8 @@ int crypto_kem_dec(unsigned char *ss,
 int kemenc_Attack(unsigned char * ct, 
                   unsigned char * m, 
                   const unsigned char * pk, 
-                  int h, int k, int select) 
+                  int8_t h[], int block_index) 
 {
   /* call enc to choose ct */
-  enc(ct, m, h, k, select);
-  
-}
-
-
-/* build the Oracle */
-/*
-*   input : ct, sk, msg_A
-*   output: 0 or 1
-*/
-int oracle(const unsigned char * ct, 
-           const unsigned char * sk, 
-           unsigned char * msg_A) 
-{
-
-  unsigned char m_dec[KYBER_SYMBYTES] = { 0 };
-  
-
-  indcpa_dec(m_dec, ct, sk);     //decrypt the ct
-  /* check msg_A given by adversary ==  the m_dec decrypted by oracle */
-  for(int a = 0; a < KYBER_SYMBYTES; a++) {
-    if(msg_A[a] != m_dec[a]){
-      //printf("a:%d miss:%d %d\n", a, msg_A[a], m_dec[a]);
-      return 0;
-    }
-  }
-  
-  return 1;
+  enc(ct, m, h, block_index);
 }
