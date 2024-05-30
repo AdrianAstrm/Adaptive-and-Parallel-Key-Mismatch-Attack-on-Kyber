@@ -3,7 +3,7 @@
 This repository contains a demostration of the adaptive and parallel key mismatch attack on Kyber, presented by Guo, Mårtensson and Åström in the article:
 
 **"The Perils of Limited Key Reuse: Adaptive and Parallel Mismatch Attacks with Post-processing Against Kyber"**  
-(to be uploaded to ePrint)  
+Avaliable at: https://eprint.iacr.org/2024/810
 
 The attack builds on an attack by Qin et al., presented in: 
 
